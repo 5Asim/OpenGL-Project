@@ -7,8 +7,12 @@ class App:
         def __init__(self):
                 # Initialize pygame and create a window
                 pg.init()
-                pg.display.set_mode((640, 480), pg.OPENGL|pg.DOUBLEBUF)
+                pg.display.set_mode((640, 512), pg.OPENGL|pg.DOUBLEBUF)
                 self.clock = pg.time.Clock()
+                
+                #set the text that appears in the title bar of the window
+                pg.display.set_caption("Graphics Window")
+                print("Initializing program... ")
                 
                 # Initialize OpenGL
                 glClearColor(0.1, 0.2, 0.2, 1)
@@ -16,8 +20,8 @@ class App:
                 glUseProgram(self.shader)
                 
                 # Initialize shapes
-                self.shapes = [Triangle(), Pyramid()]  # Add more shapes if needed
-                self.current_shape_index = 0  # Start with the first shape
+                self.shapes = [Triangle(), Pyramid(), Cube()]  # Add more shapes if needed
+                self.current_shape_index = 2  # Start with the first shape
                 
                 self.mainLoop()
                 
@@ -40,12 +44,14 @@ class App:
 
 
         def mainLoop(self):
+                
+                #run the app
                 running = True
                 while running:
                         for event in pg.event.get():
-                                if event.type == pg.QUIT:
+                                if (event.type == pg.QUIT):
                                         running = False
-                                elif event.type == pg.KEYDOWN:
+                                elif (event.type == pg.KEYDOWN):
                                         if event.key == pg.K_n:  # Press 'n' to switch to the next shape
                                                 self.current_shape_index = (self.current_shape_index + 1) % len(self.shapes)
                 
@@ -141,6 +147,58 @@ class Pyramid:
                 glEnableVertexAttribArray(1)
                 
                 glBindVertexArray(0)  # Unbind VAO
+                
+        def destroy(self):
+                glDeleteVertexArrays(1, (self.vao,))
+                glDeleteBuffers(1, (self.vbo,))
+                glDeleteBuffers(1, (self.ebo,))
+                
+                
+
+class Cube:
+        def __init__(self):
+                self.vertices = np.array([
+                -0.5, -0.5, 0.5, 1.0, 0.0, 0.0,
+                 0.5, -0.5, 0.5, 0.0, 1.0, 0.0,
+                 0.5,  0.5, 0.5, 0.0, 0.0, 1.0,
+                -0.5,  0.5, 0.5, 1.0, 1.0, 1.0,
+                 
+                -0.5, -0.5, -0.5, 1.0, 0.0, 0.0,
+                 0.5, -0.5, -0.5, 0.0, 1.0, 0.0,
+                 0.5,  0.5, -0.5, 0.0, 0.0, 1.0,
+                -0.5,  0.5, -0.5, 1.0, 1.0, 1.0,
+                ],dtype=np.float32)
+                
+                self.indices = np.array([
+                # Pentagons
+                0, 1, 2, 2, 3, 0,
+                4, 5, 6, 6, 7, 4,
+                4, 5, 1, 1, 0, 4,
+                6, 7, 3, 3, 2, 6,
+                5, 6, 2, 2, 1, 5,
+                7, 4, 0, 0, 3, 7,
+                ], dtype=np.uint32)
+                
+                self.vertex_count = len(self.indices)
+                
+                self.vao = glGenVertexArrays(1)
+                glBindVertexArray(self.vao)
+
+                self.vbo = glGenBuffers(1)
+                glBindBuffer(GL_ARRAY_BUFFER, self.vbo)
+                glBufferData(GL_ARRAY_BUFFER, self.vertices.nbytes, self.vertices, GL_STATIC_DRAW)
+
+                self.ebo = glGenBuffers(1)
+                glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, self.ebo)
+                glBufferData(GL_ELEMENT_ARRAY_BUFFER, self.indices.nbytes, self.indices, GL_STATIC_DRAW)
+
+                glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, 24, ctypes.c_void_p(0))
+                glEnableVertexAttribArray(0)
+
+                glVertexAttribPointer(1, 3, GL_FLOAT, GL_FALSE, 24, ctypes.c_void_p(12))
+                glEnableVertexAttribArray(1)
+
+                glBindVertexArray(0)  # Unbind VAO       
                 
         def destroy(self):
                 glDeleteVertexArrays(1, (self.vao,))
