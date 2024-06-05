@@ -2,8 +2,8 @@ from OpenGL.GL import *
 from OpenGL.GLU import *
 from OpenGL.GLUT import *
 
-WINDOW_WIDTH = 1200
-WINDOW_HEIGHT = 700
+WINDOW_WIDTH = 1280
+WINDOW_HEIGHT = 1020
 
 '''
 To draw the health bar we have to do 3 steps:
@@ -14,28 +14,29 @@ To draw the health bar we have to do 3 steps:
 '''
 
 
-# 1- drawing the white bar on the top left of the screen relative to the car center.
 def draw_white_bar(center):
     glColor3f(1, 1, 1)
     glBegin(GL_POLYGON)
-    glVertex(center[0] - 60 - 230, center[1] - 7 + 165, 0)
-    glVertex(center[0] + 60 - 230, center[1] - 7 + 165, 0)
-    glVertex(center[0] + 60 - 230, center[1] + 7 + 165, 0)
-    glVertex(center[0] - 60 - 230, center[1] + 7 + 165, 0)
+    # Adjusted vertices for a vertical bar, moved down by 170 units
+    glVertex3f(center[0] - 10 - 230 - 10, center[1] + 60 + 165 - 170, 0)
+    glVertex3f(center[0] + 10 - 230 - 10, center[1] + 60 + 165 - 170, 0)
+    glVertex3f(center[0] + 10 - 230 - 10, center[1] - 60 + 165 - 170, 0)
+    glVertex3f(center[0] - 10 - 230 - 10, center[1] - 60 + 165 - 170, 0)
     glEnd()
 
 def draw_health_bar(health, center):
-    # 2- as health decreases the green degree decreases and the red degree increases.
+    # As health decreases, the green decreases and the red increases.
     glColor3f(1 - health / 100, health / 100, 0)
-    # 3- drawing the bar depends mainly on health as (Green_Section / 116 = health / 100)
+    # Calculating the height of the green section based on health
     Green_Section = (health * (116 / 100))
     glBegin(GL_POLYGON)
-    # 4- fixing the left side of the health to decrease only from right.
-    glVertex(center[0] - 58 - 230, center[1] - 5 + 165, 0)
-    glVertex(center[0] - 58 + Green_Section - 230, center[1] - 5 + 165, 0)
-    glVertex(center[0] - 58 + Green_Section - 230, center[1] + 5 + 165, 0)
-    glVertex(center[0] - 58 - 230, center[1] + 5 + 165, 0)
+    # Fixing the bottom side of the health bar to decrease only from the top, moved down by 170 units
+    glVertex3f(center[0] - 10 - 230 - 10, center[1] - 59 + 165 - 170, 0)
+    glVertex3f(center[0] + 10 - 230 - 10, center[1] - 59 + 165 - 170, 0)
+    glVertex3f(center[0] + 10 - 230 - 10, center[1] - 59 + Green_Section + 165 - 170, 0)
+    glVertex3f(center[0] - 10 - 230 - 10, center[1] - 59 + Green_Section + 165 - 170, 0)
     glEnd()
+
 
 
 def draw_health(health, center):

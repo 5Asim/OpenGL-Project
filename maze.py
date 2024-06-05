@@ -16,13 +16,24 @@ class line:
     def get_vertices(self):
         return [[self.x1, self.y1], [self.x2, self.y2]]
     def draw_line(self):
-        glColor3f(1, 0, 0)
-        glLineWidth(4)
+        glColor3f(0, 1, 0)
+        glLineWidth(3)
         glBegin(GL_LINES)
         glVertex(self.x1, self.y1, 0)
         glVertex(self.x2, self.y2, 0)
         glEnd()
-
+        
+    def draw_dashed_line(self):
+        glColor3f(1, 1, 1)
+        glLineWidth(3)
+        glEnable(GL_LINE_STIPPLE)
+        glLineStipple(30, 0xAAAA)  # Dash pattern
+        glBegin(GL_LINES)
+        glVertex3f(self.x1, self.y1, 0)
+        glVertex3f(self.x2, self.y2, 0)
+        glEnd()
+        glDisable(GL_LINE_STIPPLE)
+        
 
 class box:
     def __init__(self, left, bottom, right, top, Type = 0):
@@ -100,6 +111,7 @@ health1 = [box(1125, 140, 1145, 160, 2), box(750, 440, 770, 460, 2),
 # finish line of maze
 finish = [box(730, 507-0.5, 750, 593+0.5, 3)]
 
+
 # reset every box in the given list of boxes to its initial state
 def reset(lst_of_box : box):
     for i in lst_of_box:
@@ -152,3 +164,16 @@ def draw_grid():
         glVertex(i*150, -1500, 0)
         glVertex(i*150, 1500, 0)
     glEnd()
+    
+def draw_dashed_lines():
+    for wall in maze1:
+        if wall.vertical:
+            # Draw a dashed line to the left of the vertical line
+            if wall.x1 > 0:
+                dashed_line = line(wall.x1 - LINE_WIDTH*15/2, wall.y1, wall.x2 - LINE_WIDTH*15/2, wall.y2)
+                dashed_line.draw_dashed_line()
+        else:
+            # Draw a dashed line above the horizontal line
+            if wall.y1 < 700:
+                dashed_line = line(wall.x1, wall.y1 + LINE_WIDTH*10/2, wall.x2, wall.y2 + LINE_WIDTH*10/2)
+                dashed_line.draw_dashed_line()
