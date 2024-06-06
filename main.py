@@ -5,12 +5,12 @@ from OpenGL.GL import *
 from maze import *
 from car import *
 from collision import *
-from Healthbar import *
+from healthbar import *
 from texture import *
 from OpenGL.GLUT import GLUT_STROKE_MONO_ROMAN
 
-WINDOW_WIDTH = 1200
-WINDOW_HEIGHT = 700
+WINDOW_WIDTH = 1280
+WINDOW_HEIGHT = 720
 PERIOD = 10
 First_Start_Flag = True
 Go_Drive_Flag = False
@@ -26,13 +26,13 @@ you_win = 0
 carModel = car()
 
 pygame.init()
-font = pygame.font.Font(None, 36) 
+font = pygame.font.Font(None, 36)
 sounds = [pygame.mixer.Sound("Sound/crash.wav"),
           pygame.mixer.Sound("Sound/coin.wav"),
           pygame.mixer.Sound("Sound/revive.wav"),
           pygame.mixer.Sound("Sound/car_horn.wav"),
           pygame.mixer.Sound("Sound/starting_game.wav"),
-          pygame.mixer.Sound("Sound/go_driving.wav"),
+          pygame.mixer.Sound("Sound/lambo_drive.wav"),
           pygame.mixer.Sound("Sound/car_reverse.wav"),
           pygame.mixer.Sound("Sound/car_break.wav"),
           pygame.mixer.Sound("Sound/song.wav"),
@@ -75,8 +75,6 @@ def display():
     if credits_sc == 1:
         if 260 <= mouse_x <= 460 and 600 <= mouse_y <= 680:
             draw_texture(260, 20, 460, 100, BACK_RED)
-        else:
-            draw_texture(260, 20, 460, 100, BACK_YELLOW)
         draw_texture(0, 0, WINDOW_WIDTH, WINDOW_HEIGHT, CREDIT_SCREEN)
 
     elif start_game == 0:
@@ -84,17 +82,17 @@ def display():
         if 280 <= mouse_x <= 520 and 280 <= mouse_y <= 360:
             draw_texture(280, 340, 520, 420, START_RED)
         else:
-            draw_texture(280, 340, 520, 420, START_YELLOW)
+            draw_texture(280, 340, 520, 420, START_RED)
 
         if 280 <= mouse_x <= 520 and 380 <= mouse_y <= 460:
             draw_texture(280, 240, 520, 320, CREDIT_RED)
         else:
-            draw_texture(280, 240, 520, 320, CREDIT_YELLOW)
+            draw_texture(280, 240, 520, 320, CREDIT_RED)
 
         if 280 <= mouse_x <= 520 and 480 <= mouse_y <= 560:
             draw_texture(280, 140, 520, 220, EXIT_RED)
         else:
-            draw_texture(280, 140, 520, 220, EXIT_YELLOW)
+            draw_texture(280, 140, 520, 220, EXIT_RED)
         draw_texture(0, 0, WINDOW_WIDTH, WINDOW_HEIGHT, START_SCREEN)
 
     elif start_game == 1:
@@ -104,7 +102,7 @@ def display():
         glOrtho(cen[0] - 300, cen[0] + 300, cen[1] - 175, cen[1] + 175, -1, 1)
         glMatrixMode(GL_MODELVIEW)
         glLoadIdentity()
-        glClearColor(0.2, 0.2, 0.2, 0)
+        glClearColor(0, 0, 0, 0)
 
         if test_car_walls(carModel, maze1):
             carModel.collosion = True
@@ -136,6 +134,7 @@ def display():
         draw_health(carModel.health, cen)
         glPushMatrix()
         s = "stars : " + str(carModel.coins)
+        print_text(s,cen[0]-285,cen[1] + 140)
         glPopMatrix()
 
         draw_map()
@@ -148,6 +147,8 @@ def display():
         carModel.animation()
         carModel.draw()
         glPopMatrix()
+        
+        draw_dashed_lines()
 
     elif game_over == 1:
         sounds[8].stop()
@@ -157,15 +158,15 @@ def display():
         glOrtho(0, WINDOW_WIDTH, 0, WINDOW_HEIGHT, 0, 1)
         glMatrixMode(GL_MODELVIEW)
 
-        if 480 <= mouse_x <= 720 and 450 <= mouse_y <= 550:
+        if 480 <= mouse_x <= 720 and 450 <= mouse_y <= 550:  # TRY AGAIN button area
+            draw_texture(480, 150, 720, 250, TRY_AGAIN_RED)  # Highlighted texture
+        else:
             draw_texture(480, 150, 720, 250, TRY_AGAIN_RED)
-        else:
-            draw_texture(480, 150, 720, 250, TRY_AGAIN_YEL)
 
-        if 480 <= mouse_x <= 720 and 570 <= mouse_y <= 670:
-            draw_texture(480, 30, 720, 130, EXIT2_RED)
+        if 480 <= mouse_x <= 720 and 570 <= mouse_y <= 670:  # EXIT button area
+            draw_texture(480, 30, 720, 130, EXIT2_RED)  # Highlighted texture
         else:
-            draw_texture(480, 30, 720, 130, EXIT2_YEL)
+            draw_texture(480, 30, 720, 130, EXIT2_RED)
 
         draw_texture(0, 0, WINDOW_WIDTH, WINDOW_HEIGHT, PLAY_AGAIN)
 
@@ -178,13 +179,32 @@ def display():
         glMatrixMode(GL_MODELVIEW)
         glLoadIdentity()
 
-        if 480 <= mouse_x <= 720 and 570 <= mouse_y <= 670:
-            draw_texture(480, 30, 720, 130, HOME_RED)
+        # Draw the "You Win" texture
+        draw_texture(480, 570, 720, 670, HOME_RED)
+        draw_texture(0, 0, WINDOW_WIDTH, WINDOW_HEIGHT, YOU_WIN)
+
+        # Draw Play Again and Exit buttons
+        if 480 <= mouse_x <= 720 and 450 <= mouse_y <= 550:  # Play Again button area
+            draw_texture(480, 150, 720, 250, HOME_RED)  # Highlighted texture
         else:
-            draw_texture(480, 30, 720, 130, HOME_YEL)
+            draw_texture(480, 150, 720, 250, HOME_RED)
+
+        if 480 <= mouse_x <= 720 and 570 <= mouse_y <= 670:  # Exit button area
+            draw_texture(480, 30, 720, 130, EXIT2_RED)  # Highlighted texture
+        else:
+            draw_texture(480, 30, 720, 130, EXIT2_RED)
+
         draw_texture(0, 0, WINDOW_WIDTH, WINDOW_HEIGHT, YOU_WIN)
 
     glfw.swap_buffers(window)
+
+def print_text(text_string, x, y):
+    font = pygame.font.Font(None, 64)
+    text_surface = font.render(text_string, True, (255, 255, 0, 255))
+    text_data = pygame.image.tostring(text_surface, "RGBA", True)
+    
+    glRasterPos2d(x, y)
+    glDrawPixels(text_surface.get_width(), text_surface.get_height(), GL_RGBA, GL_UNSIGNED_BYTE, text_data)
 
 
 def draw_texture(left, bottom, right, top, tex_iden):
@@ -201,7 +221,6 @@ def draw_texture(left, bottom, right, top, tex_iden):
     glVertex2f(left, top)
     glEnd()
     glBindTexture(GL_TEXTURE_2D, -1)
-
 
 
 def handle_keys(window, key, scancode, action, mods):
@@ -256,8 +275,6 @@ def handle_keys(window, key, scancode, action, mods):
             Break_Flag = False
 
 
-
-
 def handle_mouse_button(window, button, action, mods):
     global start_game, credits_sc, you_win, game_over
 
@@ -283,18 +300,20 @@ def handle_mouse_button(window, button, action, mods):
                 exit(0)
 
         elif game_over == 1:
-            if 480 <= mouse_x <= 720 and 450 <= mouse_y <= 550:
+            if 480 <= mouse_x <= 720 and 450 <= mouse_y <= 550:  # TRY AGAIN button area
                 carModel.__init__()
                 game_over = 0
-                start_game = 0
-            if 480 <= mouse_x <= 720 and 570 <= mouse_y <= 670:
-                exit(0)
+                start_game = 1  # Restart the game
+            if 480 <= mouse_x <= 720 and 570 <= mouse_y <= 670:  # EXIT button area
+                glfw.set_window_should_close(window, True)  # Request window to close
 
         elif you_win == 1:
-            if 480 <= mouse_x <= 720 and 570 <= mouse_y <= 670:
+            if 480 <= mouse_x <= 720 and 450 <= mouse_y <= 550:  # Play Again button area
                 you_win = 0
                 carModel.__init__()
-                start_game = 0
+                start_game = 1  # Restart the game
+            if 480 <= mouse_x <= 720 and 570 <= mouse_y <= 670:  # EXIT button area
+                glfw.set_window_should_close(window, True)  # Request window to close
 
         else:
             if 280 <= mouse_x <= 520 and 280 <= mouse_y <= 360:
