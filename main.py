@@ -5,7 +5,7 @@ from OpenGL.GL import *
 from maze import *
 from car import *
 from collision import *
-from healthbar import *
+from Healthbar import *
 from texture import *
 from OpenGL.GLUT import GLUT_STROKE_MONO_ROMAN
 
@@ -68,9 +68,9 @@ def display():
     mouse_x
     mouse_y
 
-    if carModel.health <= 0:
-        start_game = 2
-        game_over = 1
+    # if carModel.health <= 0:
+    #     start_game = 2
+    #     game_over = 1
 
     if credits_sc == 1:
         if 260 <= mouse_x <= 460 and 600 <= mouse_y <= 680:
@@ -111,36 +111,16 @@ def display():
             sounds[5].stop()
             sounds[6].stop()
 
-        if test_car_bomb(carModel, bombs1):
-            sounds[12].set_volume(0.5)
-            sounds[12].play(0)
-            carModel.health -= 50
-
-        if test_car_coin(carModel, coins1):
-            carModel.coins += 1
-            sounds[1].play(0)
-
-        if test_car_health(carModel, health1):
-            carModel.health = carModel.health + 20 if carModel.health + 20 < 100 else 100
-            sounds[2].set_volume(0.2)
-            sounds[2].play(0)
-
-        if test_car_finish(carModel, finish):
-            sounds[13].set_volume(0.5)
-            sounds[13].play(0)
-            you_win = 1
-            start_game = 4
-
         draw_health(carModel.health, cen)
         glPushMatrix()
-        s = "stars : " + str(carModel.coins)
-        print_text(s,cen[0]-285,cen[1] + 140)
+        # s = "stars : " + str(carModel.coins)
+        # print_text(s,cen[0]-285,cen[1] + 140)
         glPopMatrix()
 
         draw_map()
-        draw_coins()
-        draw_healthkit()
-        draw_bombs()
+        # draw_coins()
+        # draw_healthkit()
+        # draw_bombs()
         draw_finish()
 
         glPushMatrix()
@@ -275,51 +255,6 @@ def handle_keys(window, key, scancode, action, mods):
             Break_Flag = False
 
 
-def handle_mouse_button(window, button, action, mods):
-    global start_game, credits_sc, you_win, game_over
-
-    if action == glfw.PRESS and button == glfw.MOUSE_BUTTON_LEFT:
-        x, y = glfw.get_cursor_pos(window)
-        y = WINDOW_HEIGHT - y
-        global mouse_x, mouse_y
-        mouse_x, mouse_y = int(x), int(y)
-        sounds[10].play(0)
-
-        if credits_sc == 1:
-            if 260 <= mouse_x <= 460 and 600 <= mouse_y <= 680:
-                credits_sc = 0
-
-        elif start_game == 0:
-            if 280 <= mouse_x <= 520 and 380 <= mouse_y <= 460:
-                credits_sc = 1
-            if 280 <= mouse_x <= 520 and 280 <= mouse_y <= 360:
-                sounds[4].set_volume(0.2)
-                sounds[4].play(0)
-                start_game = 1
-            if 280 <= mouse_x <= 520 and 480 <= mouse_y <= 560:
-                exit(0)
-
-        elif game_over == 1:
-            if 480 <= mouse_x <= 720 and 450 <= mouse_y <= 550:  # TRY AGAIN button area
-                carModel.__init__()
-                game_over = 0
-                start_game = 1  # Restart the game
-            if 480 <= mouse_x <= 720 and 570 <= mouse_y <= 670:  # EXIT button area
-                glfw.set_window_should_close(window, True)  # Request window to close
-
-        elif you_win == 1:
-            if 480 <= mouse_x <= 720 and 450 <= mouse_y <= 550:  # Play Again button area
-                you_win = 0
-                carModel.__init__()
-                start_game = 1  # Restart the game
-            if 480 <= mouse_x <= 720 and 570 <= mouse_y <= 670:  # EXIT button area
-                glfw.set_window_should_close(window, True)  # Request window to close
-
-        else:
-            if 280 <= mouse_x <= 520 and 280 <= mouse_y <= 360:
-                start_game = 1
-
-
 def main():
     if not glfw.init():
         return
@@ -332,7 +267,6 @@ def main():
 
     glfw.make_context_current(window)
     glfw.set_key_callback(window, handle_keys)
-    glfw.set_mouse_button_callback(window, handle_mouse_button)
     glfw.swap_interval(1)
     init_proj()
 
