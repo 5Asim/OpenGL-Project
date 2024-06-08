@@ -20,8 +20,7 @@ class car:
         self.top = 50
         
         # Car State
-        self.health = 100
-        self.coins = 0
+        self.health = 100   
         self.light = False
         # Car Pyhsics
         self.rot = 0  # is am rotating or not -->> can be 1.5 or -1.5
@@ -33,6 +32,8 @@ class car:
         # in case of inertia
         self.friction = -0.05
         self.collosion = False
+        self.initial_position = (0, 0)  # Set the initial position as needed
+        self.reset_position()
 
     def draw(self):
         """
@@ -115,6 +116,12 @@ class car:
 
         # We need to adjust rotAngle -->> if self.rot is active
         self.rotAngle += self.rot*self.currSpeed*0.5
+        
+    def reset_position(self):
+        self.left, self.bottom, self.right, self.top = 20, 20, 80, 50
+        self.rotAngle = 0
+        self.currSpeed = 0
+        self.speed = 0
 
     def load_texture(self):
         return

@@ -8,6 +8,7 @@ from collision import *
 from Healthbar import *
 from texture import *
 from OpenGL.GLUT import GLUT_STROKE_MONO_ROMAN
+from maze import finish
 
 WINDOW_WIDTH = 1280
 WINDOW_HEIGHT = 720
@@ -35,12 +36,12 @@ sounds = [pygame.mixer.Sound("Sound/crash.wav"),
           pygame.mixer.Sound("Sound/lambo_drive.wav"),
           pygame.mixer.Sound("Sound/car_reverse.wav"),
           pygame.mixer.Sound("Sound/car_break.wav"),
-          pygame.mixer.Sound("Sound/song.wav"),
+          pygame.mixer.Sound("Sound/win.wav"),
           pygame.mixer.Sound("Sound/lobby_music.wav"),
           pygame.mixer.Sound("Sound/mouse_point.wav"),
           pygame.mixer.Sound("Sound/car_reverse1.wav"),
           pygame.mixer.Sound("Sound/bomb.wav"),
-          pygame.mixer.Sound("Sound/bravo.wav")
+          pygame.mixer.Sound("Sound/win.wav"),
           ]
 sounds[8].set_volume(0.3)
 sounds[10].set_volume(0.5)
@@ -60,6 +61,8 @@ def init_proj():
 
 
 def display():
+    global credits_sc 
+    credits_sc = 0
     glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT)
     global start_game, game_over, you_win, mouse_x, mouse_y
     start_game = 1
@@ -68,14 +71,29 @@ def display():
     mouse_x
     mouse_y
 
-    # if carModel.health <= 0:
-    #     start_game = 2
-    #     game_over = 1
-
     if credits_sc == 1:
         if 260 <= mouse_x <= 460 and 600 <= mouse_y <= 680:
             draw_texture(260, 20, 460, 100, BACK_RED)
         draw_texture(0, 0, WINDOW_WIDTH, WINDOW_HEIGHT, CREDIT_SCREEN)
+        
+    elif you_win == 1:
+        sounds[8].stop()
+        glClearColor(0, 0, 0, 0)
+        glMatrixMode(GL_PROJECTION)
+        glLoadIdentity()
+        glOrtho(0, WINDOW_WIDTH, 0, WINDOW_HEIGHT, 0, 1)
+        glMatrixMode(GL_MODELVIEW)
+        glLoadIdentity()
+        draw_texture(0, 0, WINDOW_WIDTH, WINDOW_HEIGHT, YOU_WIN)
+        
+    elif game_over == 1:
+        glClearColor(0, 0, 0, 0)
+        glMatrixMode(GL_PROJECTION)
+        glLoadIdentity()
+        glOrtho(0, WINDOW_WIDTH, 0, WINDOW_HEIGHT, 0, 1)
+        glMatrixMode(GL_MODELVIEW)
+        glLoadIdentity()
+        draw_texture(0, 0, WINDOW_WIDTH, WINDOW_HEIGHT, TRY_AGAIN_RED)
 
     elif start_game == 0:
         glLoadIdentity()
@@ -103,6 +121,10 @@ def display():
         glMatrixMode(GL_MODELVIEW)
         glLoadIdentity()
         glClearColor(0, 0, 0, 0)
+        
+        if carModel.health <= 0:
+            game_over = 1
+            start_game = 0 
 
         if test_car_walls(carModel, maze1):
             carModel.collosion = True
@@ -113,14 +135,9 @@ def display():
 
         draw_health(carModel.health, cen)
         glPushMatrix()
-        # s = "stars : " + str(carModel.coins)
-        # print_text(s,cen[0]-285,cen[1] + 140)
         glPopMatrix()
 
         draw_map()
-        # draw_coins()
-        # draw_healthkit()
-        # draw_bombs()
         draw_finish()
 
         glPushMatrix()
@@ -129,52 +146,9 @@ def display():
         glPopMatrix()
         
         draw_dashed_lines()
+        check_collision_with_finish()
 
-    elif game_over == 1:
-        sounds[8].stop()
-        glClearColor(0, 0, 0, 0)
-        glMatrixMode(GL_PROJECTION)
-        glLoadIdentity()
-        glOrtho(0, WINDOW_WIDTH, 0, WINDOW_HEIGHT, 0, 1)
-        glMatrixMode(GL_MODELVIEW)
-
-        if 480 <= mouse_x <= 720 and 450 <= mouse_y <= 550:  # TRY AGAIN button area
-            draw_texture(480, 150, 720, 250, TRY_AGAIN_RED)  # Highlighted texture
-        else:
-            draw_texture(480, 150, 720, 250, TRY_AGAIN_RED)
-
-        if 480 <= mouse_x <= 720 and 570 <= mouse_y <= 670:  # EXIT button area
-            draw_texture(480, 30, 720, 130, EXIT2_RED)  # Highlighted texture
-        else:
-            draw_texture(480, 30, 720, 130, EXIT2_RED)
-
-        draw_texture(0, 0, WINDOW_WIDTH, WINDOW_HEIGHT, PLAY_AGAIN)
-
-    elif you_win == 1:
-        sounds[8].stop()
-        glClearColor(0, 0, 0, 0)
-        glMatrixMode(GL_PROJECTION)
-        glLoadIdentity()
-        glOrtho(0, WINDOW_WIDTH, 0, WINDOW_HEIGHT, 0, 1)
-        glMatrixMode(GL_MODELVIEW)
-        glLoadIdentity()
-
-        # Draw the "You Win" texture
-        draw_texture(480, 570, 720, 670, HOME_RED)
-        draw_texture(0, 0, WINDOW_WIDTH, WINDOW_HEIGHT, YOU_WIN)
-
-        # Draw Play Again and Exit buttons
-        if 480 <= mouse_x <= 720 and 450 <= mouse_y <= 550:  # Play Again button area
-            draw_texture(480, 150, 720, 250, HOME_RED)  # Highlighted texture
-        else:
-            draw_texture(480, 150, 720, 250, HOME_RED)
-
-        if 480 <= mouse_x <= 720 and 570 <= mouse_y <= 670:  # Exit button area
-            draw_texture(480, 30, 720, 130, EXIT2_RED)  # Highlighted texture
-        else:
-            draw_texture(480, 30, 720, 130, EXIT2_RED)
-
-        draw_texture(0, 0, WINDOW_WIDTH, WINDOW_HEIGHT, YOU_WIN)
+   
 
     glfw.swap_buffers(window)
 
@@ -201,10 +175,25 @@ def draw_texture(left, bottom, right, top, tex_iden):
     glVertex2f(left, top)
     glEnd()
     glBindTexture(GL_TEXTURE_2D, -1)
+    
+
+# main.py
+def check_collision_with_finish():
+    global you_win, start_game, finish  # Add 'finish' to the global variables
+    car_vertices = carModel.get_vertices()
+    for f in finish:
+        box_vertices = f.get_vertices()
+        if (box_vertices[0][0] <= car_vertices[0][0] <= box_vertices[2][0]) and (box_vertices[1][1] <= car_vertices[1][1] <= box_vertices[0][1]):
+            you_win = 1
+            start_game = 0  # Stop the game
+            sounds[13].play(0)  # Play the "bravo" sound effect
+            break  # Exit the loop after the first collision with the finish line
+
+
 
 
 def handle_keys(window, key, scancode, action, mods):
-    global carModel, Go_Drive_Flag, Go_Back_Flag, Break_Flag, Song_Flag
+    global carModel, Go_Drive_Flag, Go_Back_Flag, Break_Flag, Song_Flag, start_game, you_win, game_over
 
     if action == glfw.PRESS or action == glfw.REPEAT:
         if key == glfw.KEY_W:
@@ -233,6 +222,15 @@ def handle_keys(window, key, scancode, action, mods):
                 sounds[7].set_volume(0.2)
                 sounds[7].play(0)
                 Break_Flag = True
+        
+        
+        elif key == glfw.KEY_R:
+            carModel.reset_position()
+            carModel.health = 100
+            you_win = 0
+            start_game = 1 
+            game_over = 0 
+           
 
     elif action == glfw.RELEASE:
         if key == glfw.KEY_W:

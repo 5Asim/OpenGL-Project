@@ -2,9 +2,8 @@ from OpenGL.GL import *
 from OpenGL.GLU import *
 from OpenGL.GLUT import *
 from texture import *
-
+from car import car 
 LINE_WIDTH = 10
-
 class line:
     def __init__(self, x1, y1, x2, y2):  # initialize line end points (x1,y1) & (x2,y2)
         self.x1 = x1
@@ -84,6 +83,15 @@ maze1 = [
     line(1200, 0, 1200, 700), line(1200, 700, 0, 700)
 ]
 
+class FinishLine:
+    def __init__(self, x1, y1, x2, y2):
+        self.x1 = x1
+        self.y1 = y1
+        self.x2 = x2
+        self.y2 = y2
+
+    def get_vertices(self):
+        return [(self.x1, self.y1), (self.x1, self.y2), (self.x2, self.y2), (self.x2, self.y1)]
 # Finish line of maze
 finish = [box(730, 507-0.5, 750, 593+0.5, 3)]
 

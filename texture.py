@@ -19,10 +19,10 @@ CREDIT_RED = 7
 BACK_RED = 8
 BOMB = 9
 PLAY_AGAIN = 10
-TRY_AGAIN_RED = 11
+TRY_AGAIN_RED = 8
 EXIT2_RED = 12
 FINISH_LINE = 13
-YOU_WIN = 14
+YOU_WIN = 12
 HOME_RED = 15
 
 def load_texture():
@@ -41,16 +41,16 @@ def load_texture():
     images.append(pygame.image.load("texture/exit_red.png"))
     images.append(pygame.image.load("texture/start_red.png"))
     images.append(pygame.image.load("texture/start_screen.png"))
-    images.append(pygame.image.load("texture/credits.png"))
+    # images.append(pygame.image.load("texture/credits.png"))
     images.append(pygame.image.load("texture/credits_red.png"))
     images.append(pygame.image.load("texture/back_red.png"))
-    images.append(pygame.image.load("texture/bomb.png"))
-    images.append(pygame.image.load("texture/game_over.png"))
+    # images.append(pygame.image.load("texture/bomb.png"))
+    images.append(pygame.image.load("texture/game_overr.png"))
     images.append(pygame.image.load("texture/try_again_red.png"))
     images.append(pygame.image.load("texture/exit2_red.png"))
     images.append(pygame.image.load("texture/finish_line.jpg"))
     images.append(pygame.image.load("texture/you_win.png"))
-    images.append(pygame.image.load("texture/Home_red.png"))
+    images.append(pygame.image.load("texture/finish_line.jpg"))
 
     # Convert the images to raw binary image data
     textures = [pygame.image.tostring(img, "RGBA", 1) for img in images]
