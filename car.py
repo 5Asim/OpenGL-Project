@@ -4,7 +4,6 @@ from OpenGL.GLUT import *
 from math import *
 from texture import *
 from numpy import sign
-import pygame
 
 
 class car:

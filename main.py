@@ -5,9 +5,7 @@ from OpenGL.GL import *
 from maze import *
 from car import *
 from collision import *
-from Healthbar import *
 from texture import *
-from OpenGL.GLUT import GLUT_STROKE_MONO_ROMAN
 from maze import finish
 
 WINDOW_WIDTH = 1280
@@ -37,15 +35,8 @@ sounds = [pygame.mixer.Sound("Sound/crash.wav"),
           pygame.mixer.Sound("Sound/car_reverse.wav"),
           pygame.mixer.Sound("Sound/car_break.wav"),
           pygame.mixer.Sound("Sound/win.wav"),
-          pygame.mixer.Sound("Sound/lobby_music.wav"),
-          pygame.mixer.Sound("Sound/mouse_point.wav"),
-          pygame.mixer.Sound("Sound/car_reverse1.wav"),
-          pygame.mixer.Sound("Sound/bomb.wav"),
-          pygame.mixer.Sound("Sound/win.wav"),
           ]
 sounds[8].set_volume(0.3)
-sounds[10].set_volume(0.5)
-sounds[11].set_volume(0.08)
 
 
 def init_proj():
@@ -61,8 +52,6 @@ def init_proj():
 
 
 def display():
-    global credits_sc 
-    credits_sc = 0
     glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT)
     global start_game, game_over, you_win, mouse_x, mouse_y
     start_game = 1
@@ -70,13 +59,8 @@ def display():
     you_win
     mouse_x
     mouse_y
-
-    if credits_sc == 1:
-        if 260 <= mouse_x <= 460 and 600 <= mouse_y <= 680:
-            draw_texture(260, 20, 460, 100, BACK_RED)
-        draw_texture(0, 0, WINDOW_WIDTH, WINDOW_HEIGHT, CREDIT_SCREEN)
         
-    elif you_win == 1:
+    if you_win == 1:
         sounds[8].stop()
         glClearColor(0, 0, 0, 0)
         glMatrixMode(GL_PROJECTION)
@@ -95,24 +79,6 @@ def display():
         glLoadIdentity()
         draw_texture(0, 0, WINDOW_WIDTH, WINDOW_HEIGHT, TRY_AGAIN_RED)
 
-    elif start_game == 0:
-        glLoadIdentity()
-        if 280 <= mouse_x <= 520 and 280 <= mouse_y <= 360:
-            draw_texture(280, 340, 520, 420, START_RED)
-        else:
-            draw_texture(280, 340, 520, 420, START_RED)
-
-        if 280 <= mouse_x <= 520 and 380 <= mouse_y <= 460:
-            draw_texture(280, 240, 520, 320, CREDIT_RED)
-        else:
-            draw_texture(280, 240, 520, 320, CREDIT_RED)
-
-        if 280 <= mouse_x <= 520 and 480 <= mouse_y <= 560:
-            draw_texture(280, 140, 520, 220, EXIT_RED)
-        else:
-            draw_texture(280, 140, 520, 220, EXIT_RED)
-        draw_texture(0, 0, WINDOW_WIDTH, WINDOW_HEIGHT, START_SCREEN)
-
     elif start_game == 1:
         glMatrixMode(GL_PROJECTION)
         glLoadIdentity()
@@ -121,10 +87,6 @@ def display():
         glMatrixMode(GL_MODELVIEW)
         glLoadIdentity()
         glClearColor(0, 0, 0, 0)
-        
-        if carModel.health <= 0:
-            game_over = 1
-            start_game = 0 
 
         if test_car_walls(carModel, maze1):
             carModel.collosion = True
@@ -133,7 +95,6 @@ def display():
             sounds[5].stop()
             sounds[6].stop()
 
-        draw_health(carModel.health, cen)
         glPushMatrix()
         glPopMatrix()
 
@@ -148,17 +109,7 @@ def display():
         draw_dashed_lines()
         check_collision_with_finish()
 
-   
-
     glfw.swap_buffers(window)
-
-def print_text(text_string, x, y):
-    font = pygame.font.Font(None, 64)
-    text_surface = font.render(text_string, True, (255, 255, 0, 255))
-    text_data = pygame.image.tostring(text_surface, "RGBA", True)
-    
-    glRasterPos2d(x, y)
-    glDrawPixels(text_surface.get_width(), text_surface.get_height(), GL_RGBA, GL_UNSIGNED_BYTE, text_data)
 
 
 def draw_texture(left, bottom, right, top, tex_iden):
