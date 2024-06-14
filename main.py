@@ -35,6 +35,7 @@ sounds = [pygame.mixer.Sound("Sound/crash.wav"),
           pygame.mixer.Sound("Sound/car_reverse.wav"),
           pygame.mixer.Sound("Sound/car_break.wav"),
           pygame.mixer.Sound("Sound/win.wav"),
+          pygame.mixer.Sound("Sound/bravo.wav"),
           ]
 sounds[8].set_volume(0.3)
 
@@ -61,7 +62,7 @@ def display():
     mouse_y
         
     if you_win == 1:
-        sounds[8].stop()
+        sounds[9].stop()
         glClearColor(0, 0, 0, 0)
         glMatrixMode(GL_PROJECTION)
         glLoadIdentity()
@@ -137,7 +138,7 @@ def check_collision_with_finish():
         if (box_vertices[0][0] <= car_vertices[0][0] <= box_vertices[2][0]) and (box_vertices[1][1] <= car_vertices[1][1] <= box_vertices[0][1]):
             you_win = 1
             start_game = 0  # Stop the game
-            sounds[13].play(0)  # Play the "bravo" sound effect
+            sounds[9].play(0)  # Play the "bravo" sound effect
             break  # Exit the loop after the first collision with the finish line
 
 

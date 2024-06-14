@@ -36,15 +36,13 @@ def load_texture():
 
     # Load images from files
     images.append(pygame.image.load("texture/star.png"))
-    images.append(pygame.image.load("texture/car_nepal.png"))
+    images.append(pygame.image.load("texture/redcar_ku.png"))
     images.append(pygame.image.load("texture/health.png"))
     images.append(pygame.image.load("texture/exit_red.png"))
     images.append(pygame.image.load("texture/start_red.png"))
     images.append(pygame.image.load("texture/start_screen.png"))
-    # images.append(pygame.image.load("texture/credits.png"))
     images.append(pygame.image.load("texture/credits_red.png"))
     images.append(pygame.image.load("texture/back_red.png"))
-    # images.append(pygame.image.load("texture/bomb.png"))
     images.append(pygame.image.load("texture/game_overr.png"))
     images.append(pygame.image.load("texture/try_again_red.png"))
     images.append(pygame.image.load("texture/exit2_red.png"))
