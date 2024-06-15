@@ -1,27 +1,17 @@
 from OpenGL.GL import *
-from OpenGL.GLU import *
-from OpenGL.GLUT import *
 from math import *
 from texture import *
 from numpy import sign
 
-
+#initializes the car's position and state attributes, as well as its physics attributes such as speed and acceleration.
 class car:
     def __init__(self):
-        """
-        The __init__ method initializes the car's position and state attributes,
-        as well as its physics attributes such as speed and acceleration.
-        """
         # Coordinates
         self.left = 20
         self.bottom = 20
         self.right = 80
         self.top = 50
-        
-        # Car State
-        self.health = 100   
-        self.light = False
-        # Car Pyhsics
+        # Car Physics
         self.rot = 0  # is am rotating or not -->> can be 1.5 or -1.5
         self.rotAngle = 0  # what value of rotation
         self.currSpeed = 0  # 1 if 'w' or 's' else 0
@@ -34,10 +24,8 @@ class car:
         self.initial_position = (0, 0)  # Set the initial position as needed
         self.reset_position()
 
+    # draw the car onto the screen (uses the texture module to apply a texture to the car)
     def draw(self):
-        """
-        This method uses the OpenGL library to draw the car onto the screen. It uses the texture module to apply a texture to the car.
-        """
         glBindTexture(GL_TEXTURE_2D,CAR)
         glColor3f(1, 1, 1)
         glBegin(GL_POLYGON)
@@ -56,26 +44,19 @@ class car:
 
         glBindTexture(GL_TEXTURE_2D, -1)
 
+    #calculates the center of the car, which is used in other methods to position and rotate it
     def center(self):
-        """
-        This method calculates the center of the car, which is used in other methods to position and rotate it.
-        """
         return [(self.right + self.left)/2, (self.top + self.bottom)/2]
 
+    #updates the car's position and rotation based on its speed and any collision events and  car's rotation angle if the rot attribute is set
     def animation(self):
-        """
-        This method updates the car's position and rotation based on its speed and any collision events.
-        It also updates the car's rotation angle if the rot attribute is set.
-        """
         if self.collosion:
-            self.health -= int(10*abs(self.currSpeed)) # Health decrease proportoinal to currSpeed
             sign1 = 1 if self.currSpeed > 0 else -1
             self.currSpeed = -(self.currSpeed) - 0.15*sign1 # collsion in opposite direction
             self.speed = 0 # make final speed = 0
             self.collosion = False 
         
-        # First of all we need to adjust rotation
-        # To make car rotate around it self we need to do :
+        # First adjust rotation , To make car rotate around itself we need to do :
         # 1- Translate to Origin
         # 2- Rotate around z-Axis
         # 3- Translate Back
@@ -84,7 +65,7 @@ class car:
         glTranslate(cen[0], cen[1], 0)
         glRotate(self.rotAngle, 0, 0, 1)
         glTranslate(-cen[0], -cen[1], 0)
-        #####################################
+
         # Now we need to adjust the Vertices
         theta = self.rotAngle*(pi/180)
 
@@ -112,7 +93,6 @@ class car:
                 self.currSpeed = 0
             else:
                 self.currSpeed += self.friction*sign(self.currSpeed)
-
         # We need to adjust rotAngle -->> if self.rot is active
         self.rotAngle += self.rot*self.currSpeed*0.5
         
@@ -125,13 +105,8 @@ class car:
     def load_texture(self):
         return
         
+    #calculates the four vertices of the car, which are used in collision detection, then applies a rotation matrix to the vertices to adjust for the car's rotation
     def get_vertices(self):
-        """ 
-            This method calculates the four vertices of the car, which are used in collision detection.
-            It first calculates the center of the car,
-            then applies a rotation matrix to the vertices to adjust for the car's rotation.
-        """
-        # return type is a list
         # Step 1 : Calculate the center of the car
         center = self.center()
 
@@ -163,7 +138,6 @@ class car:
             rotated_vertex[0] += center[0]
             rotated_vertex[1] += center[1]
             rotated_vertices.append(rotated_vertex)
-            
-            
+              
         # Step 6: Return the rotated vertices
         return rotated_vertices
