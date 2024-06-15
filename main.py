@@ -21,6 +21,7 @@ carModel = car()
 
 pygame.init()
 font = pygame.font.Font(None, 36)
+#sound effects
 sounds = [
           pygame.mixer.Sound("Sound/crash.wav"),
           pygame.mixer.Sound("Sound/revive.wav"),
