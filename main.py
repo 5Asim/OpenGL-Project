@@ -210,7 +210,7 @@ def main():
         return
 
     global window
-    window = glfw.create_window(WINDOW_WIDTH, WINDOW_HEIGHT, "Car Game", None, None)
+    window = glfw.create_window(WINDOW_WIDTH, WINDOW_HEIGHT, "Maze Runner", None, None)
     if not window:
         glfw.terminate()
         return

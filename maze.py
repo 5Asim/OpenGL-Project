@@ -1,6 +1,5 @@
 from OpenGL.GL import *
 from OpenGL.GLU import *
-from OpenGL.GLUT import *
 from texture import *
 from car import car 
 LINE_WIDTH = 10
@@ -152,20 +151,4 @@ def display():
     draw_dashed_lines()
 
     glDisable(GL_TEXTURE_2D)
-    glutSwapBuffers()
 
-# GLUT initialization and main loop
-def main():
-    glutInit()
-    glutInitDisplayMode(GLUT_DOUBLE | GLUT_RGB | GLUT_DEPTH)
-    glutInitWindowSize(1200, 700)
-    glutCreateWindow(b"Maze Game")
-    glClearColor(0.0, 0.0, 0.0, 1.0)
-    glMatrixMode(GL_PROJECTION)
-    glLoadIdentity()
-    gluOrtho2D(0, 1200, 0, 700)
-    glutDisplayFunc(display)
-    glutMainLoop()
-
-if __name__ == "__main__":
-    main()
