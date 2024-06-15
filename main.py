@@ -1,4 +1,3 @@
-import os
 import glfw
 import pygame
 from OpenGL.GL import *
@@ -6,7 +5,7 @@ from maze import *
 from car import *
 from collision import *
 from texture import *
-from maze import finish
+from maze import *
 
 WINDOW_WIDTH = 1280
 WINDOW_HEIGHT = 720
@@ -16,29 +15,22 @@ Go_Drive_Flag = False
 Go_Back_Flag = False
 Break_Flag = False
 On_button = False
-Song_Flag = False
-mouse_x, mouse_y = 0, 0
 start_game = 0
-game_over = 0
-credits_sc = 0
 you_win = 0
 carModel = car()
 
 pygame.init()
 font = pygame.font.Font(None, 36)
-sounds = [pygame.mixer.Sound("Sound/crash.wav"),
-          pygame.mixer.Sound("Sound/coin.wav"),
+sounds = [
+          pygame.mixer.Sound("Sound/crash.wav"),
           pygame.mixer.Sound("Sound/revive.wav"),
           pygame.mixer.Sound("Sound/car_horn.wav"),
-          pygame.mixer.Sound("Sound/starting_game.wav"),
           pygame.mixer.Sound("Sound/lambo_drive.wav"),
-          pygame.mixer.Sound("Sound/car_reverse.wav"),
+          pygame.mixer.Sound("Sound/car_reverse1.wav"),
           pygame.mixer.Sound("Sound/car_break.wav"),
           pygame.mixer.Sound("Sound/win.wav"),
-          pygame.mixer.Sound("Sound/bravo.wav"),
           ]
-sounds[8].set_volume(0.3)
-
+sounds[6].set_volume(0.3)
 
 def init_proj():
     glClearColor(0, 0, 0, 0)
@@ -51,34 +43,24 @@ def init_proj():
     glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA)
     load_texture()
 
-
 def display():
     glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT)
-    global start_game, game_over, you_win, mouse_x, mouse_y
+    global start_game, you_win
     start_game = 1
-    game_over
     you_win
-    mouse_x
-    mouse_y
-        
+    new_width = WINDOW_WIDTH * 0.8
+    new_height = WINDOW_HEIGHT * 0.8
+    new_x = (WINDOW_WIDTH - new_width) / 2
+    new_y = (WINDOW_HEIGHT - new_height) / 2
+
     if you_win == 1:
-        sounds[9].stop()
         glClearColor(0, 0, 0, 0)
         glMatrixMode(GL_PROJECTION)
         glLoadIdentity()
         glOrtho(0, WINDOW_WIDTH, 0, WINDOW_HEIGHT, 0, 1)
         glMatrixMode(GL_MODELVIEW)
         glLoadIdentity()
-        draw_texture(0, 0, WINDOW_WIDTH, WINDOW_HEIGHT, YOU_WIN)
-        
-    elif game_over == 1:
-        glClearColor(0, 0, 0, 0)
-        glMatrixMode(GL_PROJECTION)
-        glLoadIdentity()
-        glOrtho(0, WINDOW_WIDTH, 0, WINDOW_HEIGHT, 0, 1)
-        glMatrixMode(GL_MODELVIEW)
-        glLoadIdentity()
-        draw_texture(0, 0, WINDOW_WIDTH, WINDOW_HEIGHT, TRY_AGAIN_RED)
+        draw_texture(new_x, new_y, new_width, new_height, YOU_WIN)
 
     elif start_game == 1:
         glMatrixMode(GL_PROJECTION)
@@ -93,20 +75,20 @@ def display():
             carModel.collosion = True
             sounds[0].set_volume(0.2)
             sounds[0].play(0)
-            sounds[5].stop()
-            sounds[6].stop()
+            sounds[3].stop()
+            sounds[4].stop()
 
         glPushMatrix()
         glPopMatrix()
 
         draw_map()
-        draw_finish()
 
         glPushMatrix()
         carModel.animation()
         carModel.draw()
         glPopMatrix()
         
+        draw_finish()
         draw_dashed_lines()
         check_collision_with_finish()
 
@@ -138,28 +120,26 @@ def check_collision_with_finish():
         if (box_vertices[0][0] <= car_vertices[0][0] <= box_vertices[2][0]) and (box_vertices[1][1] <= car_vertices[1][1] <= box_vertices[0][1]):
             you_win = 1
             start_game = 0  # Stop the game
-            sounds[9].play(0)  # Play the "bravo" sound effect
+            sounds[6].play(0)  # Play the "win" sound effect
             break  # Exit the loop after the first collision with the finish line
 
 
-
-
 def handle_keys(window, key, scancode, action, mods):
-    global carModel, Go_Drive_Flag, Go_Back_Flag, Break_Flag, Song_Flag, start_game, you_win, game_over
+    global carModel, Go_Drive_Flag, Go_Back_Flag, Break_Flag, start_game, you_win
 
     if action == glfw.PRESS or action == glfw.REPEAT:
         if key == glfw.KEY_W:
             carModel.speed = 2.5
             if not Go_Drive_Flag and start_game == 1:
-                sounds[5].set_volume(0.1)
-                sounds[5].play(-1)
+                sounds[3].set_volume(0.1)
+                sounds[3].play(-1)
                 Go_Drive_Flag = True
 
         elif key == glfw.KEY_S:
             carModel.speed = -2
             if not Go_Back_Flag and start_game == 1:
-                sounds[6].set_volume(0.5)
-                sounds[6].play(-1)
+                sounds[4].set_volume(0.5)
+                sounds[4].play(-1)
                 Go_Back_Flag = True
 
         elif key == glfw.KEY_A:
@@ -171,28 +151,24 @@ def handle_keys(window, key, scancode, action, mods):
         elif key == glfw.KEY_SPACE:
             carModel.speed = 0
             if not Break_Flag and start_game == 1:
-                sounds[7].set_volume(0.2)
-                sounds[7].play(0)
+                sounds[5].set_volume(0.2)
+                sounds[5].play(0)
                 Break_Flag = True
-        
         
         elif key == glfw.KEY_R:
             carModel.reset_position()
-            carModel.health = 100
             you_win = 0
             start_game = 1 
-            game_over = 0 
            
-
     elif action == glfw.RELEASE:
         if key == glfw.KEY_W:
             carModel.speed = 0
-            sounds[5].stop()
+            sounds[3].stop()
             Go_Drive_Flag = False
 
         elif key == glfw.KEY_S:
             carModel.speed = 0
-            sounds[6].stop()
+            sounds[4].stop()
             Go_Back_Flag = False
 
         elif key == glfw.KEY_A:
@@ -210,7 +186,7 @@ def main():
         return
 
     global window
-    window = glfw.create_window(WINDOW_WIDTH, WINDOW_HEIGHT, "Maze Runner", None, None)
+    window = glfw.create_window(WINDOW_WIDTH, WINDOW_HEIGHT, "Maze Runner Game", None, None)
     if not window:
         glfw.terminate()
         return
@@ -223,9 +199,7 @@ def main():
     while not glfw.window_should_close(window):
         display()
         glfw.poll_events()
-
     glfw.terminate()
-
 
 if __name__ == "__main__":
     main()

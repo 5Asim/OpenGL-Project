@@ -1,7 +1,6 @@
 from OpenGL.GL import *
-from OpenGL.GLU import *
+import glfw
 from texture import *
-from car import car 
 LINE_WIDTH = 10
 class line:
     def __init__(self, x1, y1, x2, y2):  # initialize line end points (x1,y1) & (x2,y2)
@@ -151,4 +150,4 @@ def display():
     draw_dashed_lines()
 
     glDisable(GL_TEXTURE_2D)
-
+    glfw.swap_buffers()
